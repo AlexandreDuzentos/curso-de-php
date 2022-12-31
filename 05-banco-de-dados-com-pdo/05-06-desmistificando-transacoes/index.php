@@ -2,9 +2,9 @@
 require __DIR__ . '/../../fullstackphp/fsphp.php';
 fullStackPHPClassName("05.06 - Desmistificando transações");
 
-require __DIR__ . "/../source/autoload.php";
+require __DIR__ ."/source/autoload.php";
 
-use Source\Database\Connect;
+use Source\Database\Connection;
 
 /*
  * [ transaction ] https://pt.wikipedia.org/wiki/Transa%C3%A7%C3%A3o_em_base_de_dados
@@ -22,3 +22,23 @@ use Source\Database\Connect;
  * persistir no banco de dados (Uma transação só tem sentido se houver gravação)
  */
 fullStackPHPClassSession("transaction", __LINE__);
+
+
+try{
+    $pdo = Connection::getInstance();
+    $pdo->beginTransaction();
+
+    $pdo->query("INSERT INTO users (first_name, last_name, email, document)
+        values('Alexandre','Duzentos','Aduzentos12@gmail.com','233585653');");
+
+    $userId = $pdo->lastInsertId();
+
+    $pdo->query("INSERT INTO users_address(user_id, street, number, complement)
+        values($userId, 'Rua da up','3999','sala 210');");
+
+    $pdo->commit();
+
+} catch(PDOException $exception){
+    $pdo->rollback();
+      var_dump($exception);
+}
